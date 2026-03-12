@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PlannedVisits } from '../types/place';
+import { Memory, PlannedVisits } from '../types/place';
 
 const PROFILE_PHOTO_KEY = '@urban-explorer/profile-photo';
 const PLANNED_VISITS_KEY = '@urban-explorer/planned-visits';
+const MEMORIES_KEY = '@urban-explorer/memories';
 
 export async function loadProfilePhoto() {
   return AsyncStorage.getItem(PROFILE_PHOTO_KEY);
@@ -33,4 +34,22 @@ export async function loadPlannedVisits(): Promise<PlannedVisits> {
 
 export async function savePlannedVisits(visits: PlannedVisits) {
   await AsyncStorage.setItem(PLANNED_VISITS_KEY, JSON.stringify(visits));
+}
+
+export async function loadMemories(): Promise<Memory[]> {
+  const raw = await AsyncStorage.getItem(MEMORIES_KEY);
+
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(raw) as Memory[];
+  } catch {
+    return [];
+  }
+}
+
+export async function saveMemories(memories: Memory[]) {
+  await AsyncStorage.setItem(MEMORIES_KEY, JSON.stringify(memories));
 }

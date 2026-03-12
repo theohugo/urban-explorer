@@ -72,3 +72,17 @@ export interface EventItem {
 export interface PlannedVisits {
   [placeId: string]: string;
 }
+
+export interface MemoryLocation {
+  latitude: number;
+  longitude: number;
+  address: string;
+}
+
+export interface Memory {
+  id: string;
+  photoUri: string;
+  location: MemoryLocation | null;
+  timestamp: string;
+  note?: string;
+}

@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, startTransition, useContext, useEffect, useMemo, useState } from 'react';
 import { fetchParisEvents, fetchParisPlaces } from '../services/parisApi';
-import { loadPlannedVisits, loadProfilePhoto, savePlannedVisits, saveProfilePhoto } from '../services/storage';
-import { EventItem, PlannedVisits, Place } from '../types/place';
+import { loadMemories, loadPlannedVisits, loadProfilePhoto, saveMemories, savePlannedVisits, saveProfilePhoto } from '../services/storage';
+import { EventItem, Memory, PlannedVisits, Place } from '../types/place';
 
 interface PlacesContextValue {
   places: Place[];
@@ -14,12 +14,15 @@ interface PlacesContextValue {
   error: string | null;
   plannedVisits: PlannedVisits;
   profilePhotoUri: string | null;
+  memories: Memory[];
   refreshData: () => Promise<void>;
   loadMorePlaces: () => Promise<void>;
   loadMoreEvents: () => Promise<void>;
   ensurePlacesCount: (minimumCount: number) => Promise<void>;
   planVisit: (placeId: string, date: string) => Promise<void>;
   setProfilePhoto: (uri: string | null) => Promise<void>;
+  addMemory: (memory: Memory) => Promise<void>;
+  deleteMemory: (id: string) => Promise<void>;
 }
 
 const PlacesContext = createContext<PlacesContextValue | null>(null);
@@ -35,6 +38,7 @@ export function PlacesProvider({ children }: PropsWithChildren) {
   const [error, setError] = useState<string | null>(null);
   const [plannedVisits, setPlannedVisits] = useState<PlannedVisits>({});
   const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null);
+  const [memories, setMemories] = useState<Memory[]>([]);
 
   useEffect(() => {
     void refreshData();
@@ -42,11 +46,16 @@ export function PlacesProvider({ children }: PropsWithChildren) {
   }, []);
 
   async function hydrateStorage() {
-    const [storedVisits, storedPhoto] = await Promise.all([loadPlannedVisits(), loadProfilePhoto()]);
+    const [storedVisits, storedPhoto, storedMemories] = await Promise.all([
+      loadPlannedVisits(),
+      loadProfilePhoto(),
+      loadMemories(),
+    ]);
 
     startTransition(() => {
       setPlannedVisits(storedVisits);
       setProfilePhotoUri(storedPhoto);
+      setMemories(storedMemories);
     });
   }
 
@@ -201,6 +210,18 @@ export function PlacesProvider({ children }: PropsWithChildren) {
     await saveProfilePhoto(uri);
   }
 
+  async function addMemory(memory: Memory) {
+    const nextMemories = [memory, ...memories];
+    setMemories(nextMemories);
+    await saveMemories(nextMemories);
+  }
+
+  async function deleteMemory(id: string) {
+    const nextMemories = memories.filter((m) => m.id !== id);
+    setMemories(nextMemories);
+    await saveMemories(nextMemories);
+  }
+
   const value = useMemo(
     () => ({
       places,
@@ -213,12 +234,15 @@ export function PlacesProvider({ children }: PropsWithChildren) {
       error,
       plannedVisits,
       profilePhotoUri,
+      memories,
       refreshData,
       loadMorePlaces,
       loadMoreEvents,
       ensurePlacesCount,
       planVisit,
       setProfilePhoto,
+      addMemory,
+      deleteMemory,
     }),
     [
       error,
@@ -231,6 +255,7 @@ export function PlacesProvider({ children }: PropsWithChildren) {
       places,
       plannedVisits,
       profilePhotoUri,
+      memories,
     ]
   );
 
