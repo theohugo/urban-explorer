@@ -5,7 +5,6 @@ import {
   Linking,
   Modal,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -84,7 +83,7 @@ export function MapScreen() {
 
   return (
 
-    <SafeAreaView style={styles.screen}>
+    <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
         {/* Header */}
       <View style={styles.hero}>
@@ -180,6 +179,7 @@ export function MapScreen() {
           </View>
         ))}
       </View>
+      </ScrollView>
       {/* Modal souvenir */}
       <Modal
         visible={selectedMemory !== null}
@@ -239,7 +239,7 @@ export function MapScreen() {
           </Pressable>
         </Pressable>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
