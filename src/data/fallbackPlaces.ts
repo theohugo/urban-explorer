@@ -1,0 +1,68 @@
+import { Place } from '../types/place';
+
+export const FALLBACK_PLACES: Place[] = [
+  {
+    id: 'fallback-louvre',
+    name: 'Musee du Louvre',
+    address: 'Rue de Rivoli, 75001 Paris',
+    latitude: 48.8606,
+    longitude: 2.3376,
+    imageUrl: 'https://picsum.photos/seed/urban-explorer-louvre/600/400',
+  },
+  {
+    id: 'fallback-orsay',
+    name: "Musee d'Orsay",
+    address: '1 Rue de la Legion d Honneur, 75007 Paris',
+    latitude: 48.8599,
+    longitude: 2.3266,
+    imageUrl: 'https://picsum.photos/seed/urban-explorer-orsay/600/400',
+  },
+  {
+    id: 'fallback-centquatre',
+    name: 'Le CENTQUATRE-PARIS',
+    address: '5 Rue Curial, 75019 Paris',
+    latitude: 48.89,
+    longitude: 2.3714,
+    imageUrl: 'https://picsum.photos/seed/urban-explorer-104/600/400',
+  },
+  {
+    id: 'fallback-pompidou',
+    name: 'Centre Pompidou',
+    address: 'Place Georges-Pompidou, 75004 Paris',
+    latitude: 48.8606,
+    longitude: 2.3522,
+    imageUrl: 'https://picsum.photos/seed/urban-explorer-pompidou/600/400',
+  },
+  {
+    id: 'fallback-philharmonie',
+    name: 'Philharmonie de Paris',
+    address: '221 Avenue Jean Jaures, 75019 Paris',
+    latitude: 48.89,
+    longitude: 2.3932,
+    imageUrl: 'https://picsum.photos/seed/urban-explorer-philharmonie/600/400',
+  },
+  {
+    id: 'fallback-cinematheque',
+    name: 'La Cinematheque francaise',
+    address: '51 Rue de Bercy, 75012 Paris',
+    latitude: 48.8352,
+    longitude: 2.383,
+    imageUrl: 'https://picsum.photos/seed/urban-explorer-cinematheque/600/400',
+  },
+  {
+    id: 'fallback-atelier',
+    name: 'Atelier des Lumieres',
+    address: '38 Rue Saint-Maur, 75011 Paris',
+    latitude: 48.8649,
+    longitude: 2.3789,
+    imageUrl: 'https://picsum.photos/seed/urban-explorer-atelier/600/400',
+  },
+  {
+    id: 'fallback-grand-palais',
+    name: 'Grand Palais',
+    address: '7 Avenue Winston Churchill, 75008 Paris',
+    latitude: 48.8661,
+    longitude: 2.3125,
+    imageUrl: 'https://picsum.photos/seed/urban-explorer-grand-palais/600/400',
+  },
+];
