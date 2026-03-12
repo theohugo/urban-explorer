@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Linking,
   Pressable,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -66,7 +67,8 @@ export function MapScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.content} style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content}>
       <View style={styles.hero}>
         <Text style={styles.title}>Carte des lieux culturels</Text>
         <Text style={styles.text}>{locationMessage}</Text>
@@ -110,7 +112,8 @@ export function MapScreen() {
           </View>
         ))}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -118,6 +121,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingTop: 16,
   },
   content: {
     padding: 16,

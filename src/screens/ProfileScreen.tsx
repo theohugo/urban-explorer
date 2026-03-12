@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { HeroHeader } from '../components/HeroHeader';
 import { ProfilePhotoCard } from '../components/ProfilePhotoCard';
@@ -33,7 +33,8 @@ export function ProfileScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <SafeAreaView style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content}>
       <HeroHeader
         title="Votre carnet de souvenirs"
         subtitle="Conservez un portrait local dans l'application et retrouvez vos preparatifs de visite."
@@ -45,7 +46,8 @@ export function ProfileScreen() {
         <Text style={styles.infoTitle}>Fonctionnalites livrees</Text>
         <Text style={styles.infoText}>Photo de profil locale, dates de visite sauvegardees et camera integree.</Text>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -53,6 +55,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingTop: 16,
   },
   content: {
     padding: 18,

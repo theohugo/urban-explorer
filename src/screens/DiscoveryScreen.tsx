@@ -1,5 +1,5 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, ListRenderItemInfo, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, ListRenderItemInfo, RefreshControl, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AnimatedPlaceCard } from '../components/AnimatedPlaceCard';
@@ -47,7 +47,7 @@ export function DiscoveryScreen() {
   }
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
       <FlatList
         data={!error ? filteredPlaces : []}
         keyExtractor={(item) => item.id}
@@ -90,7 +90,7 @@ export function DiscoveryScreen() {
         }
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingTop: 16,
   },
   content: {
     padding: 18,

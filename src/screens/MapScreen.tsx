@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { usePlaces } from '../context/PlacesContext';
@@ -69,7 +69,7 @@ export function MapScreen() {
   }
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
       <MapView style={styles.map} initialRegion={region} region={region} onRegionChangeComplete={setRegion}>
         {userLocation && (
           <Marker
@@ -102,7 +102,7 @@ export function MapScreen() {
           )}
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingTop: 16,
   },
   map: {
     flex: 1,

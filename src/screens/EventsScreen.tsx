@@ -1,5 +1,5 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Linking, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Linking, Pressable, RefreshControl, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'react-native';
 import { ErrorState } from '../components/ErrorState';
 import { HeroHeader } from '../components/HeroHeader';
@@ -60,7 +60,7 @@ export function EventsScreen() {
   }
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
       <FlatList
         data={!error ? filteredEvents : []}
         keyExtractor={(item) => item.id}
@@ -97,7 +97,7 @@ export function EventsScreen() {
         }
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: COLORS.background,
+    paddingTop: 16,
   },
   content: {
     padding: 18,
