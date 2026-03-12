@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { usePlaces } from '../context/PlacesContext';
@@ -18,9 +18,9 @@ export function MapScreen() {
   const [region, setRegion] = useState<Region>(PARIS_REGION);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [locationMessage, setLocationMessage] = useState('Carte centree sur Paris.');
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
-    void centerOnUser();
     void ensurePlacesCount(MAP_TARGET_PLACES);
   }, []);
 
@@ -33,7 +33,13 @@ export function MapScreen() {
 
       if (permission.status !== 'granted') {
         setLocationMessage('Position refusee, affichage de Paris par defaut.');
+        setUserLocation(null);
         setRegion(PARIS_REGION);
+        Alert.alert(
+          'Permission refusée',
+          'Pour utiliser la géolocalisation, vous devez autoriser l\'accès à votre position dans les paramètres de l\'application.',
+          [{ text: 'OK' }]
+        );
         return;
       }
 
@@ -41,9 +47,15 @@ export function MapScreen() {
         accuracy: Location.Accuracy.Balanced,
       });
 
-      setRegion({
+      const userCoords = {
         latitude: currentPosition.coords.latitude,
         longitude: currentPosition.coords.longitude,
+      };
+
+      setUserLocation(userCoords);
+      setRegion({
+        latitude: userCoords.latitude,
+        longitude: userCoords.longitude,
         latitudeDelta: 0.09,
         longitudeDelta: 0.09,
       });
@@ -59,6 +71,13 @@ export function MapScreen() {
   return (
     <View style={styles.screen}>
       <MapView style={styles.map} initialRegion={region} region={region} onRegionChangeComplete={setRegion}>
+        {userLocation && (
+          <Marker
+            coordinate={userLocation}
+            title="Ma position"
+            pinColor={COLORS.text}
+          />
+        )}
         {markers.map((place) => (
           <Marker
             key={place.id}
