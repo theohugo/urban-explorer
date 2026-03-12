@@ -1,5 +1,5 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { FlatList, ListRenderItemInfo, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, ListRenderItemInfo, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AnimatedPlaceCard } from '../components/AnimatedPlaceCard';
@@ -16,7 +16,7 @@ type NavigationProp = NativeStackNavigationProp<DiscoveryStackParamList, 'Discov
 
 export function DiscoveryScreen() {
   const navigation = useNavigation<NavigationProp>();
-  const { places, plannedVisits, isLoading, error, refreshData } = usePlaces();
+  const { places, plannedVisits, isLoading, isLoadingMorePlaces, error, refreshData, loadMorePlaces } = usePlaces();
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query);
 
@@ -53,7 +53,20 @@ export function DiscoveryScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.content}
+        onEndReachedThreshold={0.4}
+        onEndReached={() => {
+          if (!deferredQuery.trim()) {
+            void loadMorePlaces();
+          }
+        }}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshData} tintColor={COLORS.accent} />}
+        ListFooterComponent={
+          isLoadingMorePlaces ? (
+            <View style={styles.footerLoader}>
+              <ActivityIndicator color={COLORS.accent} />
+            </View>
+          ) : null
+        }
         ListHeaderComponent={
           <>
             <HeroHeader
@@ -126,5 +139,8 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     marginTop: 8,
     lineHeight: 20,
+  },
+  footerLoader: {
+    paddingVertical: 12,
   },
 });

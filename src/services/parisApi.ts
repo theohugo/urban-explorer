@@ -1,8 +1,9 @@
 import { FALLBACK_PLACES } from '../data/fallbackPlaces';
 import { EventItem, ParisEventRecord, ParisEventsResponse, Place } from '../types/place';
 
-const EVENTS_API_URL =
-  'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records?limit=60&order_by=date_start';
+const EVENTS_API_BASE_URL =
+  'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records';
+const PAGE_SIZE = 30;
 
 function toAddress(record: ParisEventRecord) {
   return [record.address_street, record.address_zipcode, record.address_city]
@@ -83,8 +84,18 @@ function dedupePlaces(places: Place[]) {
   });
 }
 
-async function fetchParisEventRecords() {
-  const response = await fetch(EVENTS_API_URL);
+function buildEventsUrl(offset: number, limit: number) {
+  const params = new URLSearchParams({
+    limit: String(limit),
+    offset: String(offset),
+    order_by: 'date_start',
+  });
+
+  return `${EVENTS_API_BASE_URL}?${params.toString()}`;
+}
+
+async function fetchParisEventRecords(offset = 0, limit = PAGE_SIZE) {
+  const response = await fetch(buildEventsUrl(offset, limit));
 
   if (!response.ok) {
     throw new Error(`Paris Data responded with ${response.status}.`);
@@ -94,29 +105,28 @@ async function fetchParisEventRecords() {
   return data.results ?? [];
 }
 
-export async function fetchParisPlaces(): Promise<Place[]> {
+export async function fetchParisPlaces(offset = 0): Promise<Place[]> {
   try {
-    const records = await fetchParisEventRecords();
+    const records = await fetchParisEventRecords(offset);
     const places = dedupePlaces(
       records
-        .map((record, index) => toPlace(record, index))
+        .map((record, index) => toPlace(record, offset + index))
         .filter((place): place is Place => place !== null)
-    ).slice(0, 30);
+    );
 
-    return places.length > 0 ? places : FALLBACK_PLACES;
+    return offset === 0 && places.length === 0 ? FALLBACK_PLACES : places;
   } catch (error) {
     console.warn('Unable to load cultural places from Paris Data.', error);
-    return FALLBACK_PLACES;
+    return offset === 0 ? FALLBACK_PLACES : [];
   }
 }
 
-export async function fetchParisEvents(): Promise<EventItem[]> {
+export async function fetchParisEvents(offset = 0): Promise<EventItem[]> {
   try {
-    const records = await fetchParisEventRecords();
+    const records = await fetchParisEventRecords(offset);
     return records
-      .map((record, index) => toEvent(record, index))
-      .filter((event): event is EventItem => event !== null)
-      .slice(0, 30);
+      .map((record, index) => toEvent(record, offset + index))
+      .filter((event): event is EventItem => event !== null);
   } catch (error) {
     console.warn('Unable to load cultural events from Paris Data.', error);
     return [];

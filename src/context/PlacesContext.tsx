@@ -7,10 +7,16 @@ interface PlacesContextValue {
   places: Place[];
   events: EventItem[];
   isLoading: boolean;
+  isLoadingMorePlaces: boolean;
+  isLoadingMoreEvents: boolean;
+  hasMorePlaces: boolean;
+  hasMoreEvents: boolean;
   error: string | null;
   plannedVisits: PlannedVisits;
   profilePhotoUri: string | null;
   refreshData: () => Promise<void>;
+  loadMorePlaces: () => Promise<void>;
+  loadMoreEvents: () => Promise<void>;
   planVisit: (placeId: string, date: string) => Promise<void>;
   setProfilePhoto: (uri: string | null) => Promise<void>;
 }
@@ -21,6 +27,10 @@ export function PlacesProvider({ children }: PropsWithChildren) {
   const [places, setPlaces] = useState<Place[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMorePlaces, setIsLoadingMorePlaces] = useState(false);
+  const [isLoadingMoreEvents, setIsLoadingMoreEvents] = useState(false);
+  const [hasMorePlaces, setHasMorePlaces] = useState(true);
+  const [hasMoreEvents, setHasMoreEvents] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [plannedVisits, setPlannedVisits] = useState<PlannedVisits>({});
   const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null);
@@ -49,6 +59,8 @@ export function PlacesProvider({ children }: PropsWithChildren) {
       startTransition(() => {
         setPlaces(nextPlaces);
         setEvents(nextEvents);
+        setHasMorePlaces(nextPlaces.length > 0);
+        setHasMoreEvents(nextEvents.length > 0);
       });
     } catch (caughtError) {
       const message =
@@ -56,6 +68,78 @@ export function PlacesProvider({ children }: PropsWithChildren) {
       setError(message);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function loadMorePlaces() {
+    if (isLoading || isLoadingMorePlaces || !hasMorePlaces) {
+      return;
+    }
+
+    setIsLoadingMorePlaces(true);
+
+    try {
+      const nextPlaces = await fetchParisPlaces(places.length);
+
+      startTransition(() => {
+        if (nextPlaces.length === 0) {
+          setHasMorePlaces(false);
+          return;
+        }
+
+        setPlaces((currentPlaces) => {
+          const seen = new Set(currentPlaces.map((place) => `${place.name}-${place.address}`.toLowerCase()));
+          const mergedPlaces = [...currentPlaces];
+
+          for (const place of nextPlaces) {
+            const key = `${place.name}-${place.address}`.toLowerCase();
+
+            if (!seen.has(key)) {
+              seen.add(key);
+              mergedPlaces.push(place);
+            }
+          }
+
+          return mergedPlaces;
+        });
+      });
+    } finally {
+      setIsLoadingMorePlaces(false);
+    }
+  }
+
+  async function loadMoreEvents() {
+    if (isLoading || isLoadingMoreEvents || !hasMoreEvents) {
+      return;
+    }
+
+    setIsLoadingMoreEvents(true);
+
+    try {
+      const nextEvents = await fetchParisEvents(events.length);
+
+      startTransition(() => {
+        if (nextEvents.length === 0) {
+          setHasMoreEvents(false);
+          return;
+        }
+
+        setEvents((currentEvents) => {
+          const seen = new Set(currentEvents.map((event) => event.id));
+          const mergedEvents = [...currentEvents];
+
+          for (const event of nextEvents) {
+            if (!seen.has(event.id)) {
+              seen.add(event.id);
+              mergedEvents.push(event);
+            }
+          }
+
+          return mergedEvents;
+        });
+      });
+    } finally {
+      setIsLoadingMoreEvents(false);
     }
   }
 
@@ -79,14 +163,31 @@ export function PlacesProvider({ children }: PropsWithChildren) {
       places,
       events,
       isLoading,
+      isLoadingMorePlaces,
+      isLoadingMoreEvents,
+      hasMorePlaces,
+      hasMoreEvents,
       error,
       plannedVisits,
       profilePhotoUri,
       refreshData,
+      loadMorePlaces,
+      loadMoreEvents,
       planVisit,
       setProfilePhoto,
     }),
-    [error, events, isLoading, places, plannedVisits, profilePhotoUri]
+    [
+      error,
+      events,
+      hasMoreEvents,
+      hasMorePlaces,
+      isLoading,
+      isLoadingMoreEvents,
+      isLoadingMorePlaces,
+      places,
+      plannedVisits,
+      profilePhotoUri,
+    ]
   );
 
   return <PlacesContext.Provider value={value}>{children}</PlacesContext.Provider>;

@@ -1,5 +1,5 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { FlatList, Linking, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Linking, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'react-native';
 import { ErrorState } from '../components/ErrorState';
 import { HeroHeader } from '../components/HeroHeader';
@@ -10,7 +10,7 @@ import { COLORS } from '../theme/colors';
 import { EventItem } from '../types/place';
 
 export function EventsScreen() {
-  const { events, isLoading, error, refreshData } = usePlaces();
+  const { events, isLoading, isLoadingMoreEvents, error, refreshData, loadMoreEvents } = usePlaces();
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query);
 
@@ -66,7 +66,20 @@ export function EventsScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.content}
+        onEndReachedThreshold={0.4}
+        onEndReached={() => {
+          if (!deferredQuery.trim()) {
+            void loadMoreEvents();
+          }
+        }}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshData} tintColor={COLORS.accent} />}
+        ListFooterComponent={
+          isLoadingMoreEvents ? (
+            <View style={styles.footerLoader}>
+              <ActivityIndicator color={COLORS.accent} />
+            </View>
+          ) : null
+        }
         ListHeaderComponent={
           <>
             <HeroHeader
@@ -182,5 +195,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.text,
     fontWeight: '800',
+  },
+  footerLoader: {
+    paddingVertical: 12,
   },
 });
