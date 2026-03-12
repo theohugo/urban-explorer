@@ -16,18 +16,20 @@ const PARIS_COORDS = {
   latitude: 48.8566,
   longitude: 2.3522,
 };
+const MAP_TARGET_PLACES = 200;
 
 export function MapScreen() {
-  const { places } = usePlaces();
+  const { places, ensurePlacesCount } = usePlaces();
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [locationMessage, setLocationMessage] = useState('Carte web indisponible, affichage en liste.');
   const [userCoords, setUserCoords] = useState(PARIS_COORDS);
 
   useEffect(() => {
     void centerOnUser();
+    void ensurePlacesCount(MAP_TARGET_PLACES);
   }, []);
 
-  const markers = useMemo(() => places.slice(0, 30), [places]);
+  const markers = useMemo(() => places, [places]);
 
   async function centerOnUser() {
     setLoadingLocation(true);
@@ -68,6 +70,7 @@ export function MapScreen() {
       <View style={styles.hero}>
         <Text style={styles.title}>Carte des lieux culturels</Text>
         <Text style={styles.text}>{locationMessage}</Text>
+        <Text style={styles.text}>{markers.length} lieux charges pour la carte.</Text>
         <Text style={styles.coords}>
           Centre actuel: {userCoords.latitude.toFixed(4)}, {userCoords.longitude.toFixed(4)}
         </Text>

@@ -11,18 +11,20 @@ const PARIS_REGION: Region = {
   latitudeDelta: 0.12,
   longitudeDelta: 0.12,
 };
+const MAP_TARGET_PLACES = 200;
 
 export function MapScreen() {
-  const { places } = usePlaces();
+  const { places, ensurePlacesCount } = usePlaces();
   const [region, setRegion] = useState<Region>(PARIS_REGION);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [locationMessage, setLocationMessage] = useState('Carte centree sur Paris.');
 
   useEffect(() => {
     void centerOnUser();
+    void ensurePlacesCount(MAP_TARGET_PLACES);
   }, []);
 
-  const markers = useMemo(() => places.slice(0, 30), [places]);
+  const markers = useMemo(() => places, [places]);
 
   async function centerOnUser() {
     setLoadingLocation(true);
@@ -71,6 +73,7 @@ export function MapScreen() {
       <View style={styles.overlay}>
         <Text style={styles.overlayTitle}>Carte des lieux culturels</Text>
         <Text style={styles.overlayText}>{locationMessage}</Text>
+        <Text style={styles.overlayText}>{markers.length} points affiches sur la carte.</Text>
 
         <Pressable style={styles.button} onPress={centerOnUser} disabled={loadingLocation}>
           {loadingLocation ? (

@@ -17,6 +17,7 @@ interface PlacesContextValue {
   refreshData: () => Promise<void>;
   loadMorePlaces: () => Promise<void>;
   loadMoreEvents: () => Promise<void>;
+  ensurePlacesCount: (minimumCount: number) => Promise<void>;
   planVisit: (placeId: string, date: string) => Promise<void>;
   setProfilePhoto: (uri: string | null) => Promise<void>;
 }
@@ -143,6 +144,48 @@ export function PlacesProvider({ children }: PropsWithChildren) {
     }
   }
 
+  async function ensurePlacesCount(minimumCount: number) {
+    if (isLoading || isLoadingMorePlaces || !hasMorePlaces || places.length >= minimumCount) {
+      return;
+    }
+
+    let currentPlaces = places;
+    let currentHasMorePlaces: boolean = hasMorePlaces;
+
+    while (currentPlaces.length < minimumCount && currentHasMorePlaces) {
+      setIsLoadingMorePlaces(true);
+
+      try {
+        const nextPlaces = await fetchParisPlaces(currentPlaces.length);
+
+        if (nextPlaces.length === 0) {
+          currentHasMorePlaces = false;
+          setHasMorePlaces(false);
+          break;
+        }
+
+        const seen = new Set(currentPlaces.map((place) => `${place.name}-${place.address}`.toLowerCase()));
+        const mergedPlaces = [...currentPlaces];
+
+        for (const place of nextPlaces) {
+          const key = `${place.name}-${place.address}`.toLowerCase();
+
+          if (!seen.has(key)) {
+            seen.add(key);
+            mergedPlaces.push(place);
+          }
+        }
+
+        currentPlaces = mergedPlaces;
+        startTransition(() => {
+          setPlaces(mergedPlaces);
+        });
+      } finally {
+        setIsLoadingMorePlaces(false);
+      }
+    }
+  }
+
   async function planVisit(placeId: string, date: string) {
     const nextVisits = {
       ...plannedVisits,
@@ -173,6 +216,7 @@ export function PlacesProvider({ children }: PropsWithChildren) {
       refreshData,
       loadMorePlaces,
       loadMoreEvents,
+      ensurePlacesCount,
       planVisit,
       setProfilePhoto,
     }),
