@@ -1,4 +1,5 @@
 import { FALLBACK_PLACES } from '../data/fallbackPlaces';
+import { httpClient } from './httpClient';
 import { EventItem, ParisEventRecord, ParisEventsResponse, Place } from '../types/place';
 
 const EVENTS_API_BASE_URL =
@@ -95,13 +96,8 @@ function buildEventsUrl(offset: number, limit: number) {
 }
 
 async function fetchParisEventRecords(offset = 0, limit = PAGE_SIZE) {
-  const response = await fetch(buildEventsUrl(offset, limit));
-
-  if (!response.ok) {
-    throw new Error(`Paris Data responded with ${response.status}.`);
-  }
-
-  const data = (await response.json()) as ParisEventsResponse;
+  const response = await httpClient.get<ParisEventsResponse>(buildEventsUrl(offset, limit));
+  const data = response.data;
   return data.results ?? [];
 }
 
