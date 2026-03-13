@@ -56,15 +56,13 @@ Une application mobile multiplateforme permettant d'explorer les lieux et évén
 
 1. **Cloner le projet**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/theohugo/urban-explorer
    cd urban-explorer
    ```
 
 2. **Installer les dépendances**
    ```bash
    npm install
-   # ou
-   yarn install
    ```
 
 3. **Démarrer le serveur Expo**
@@ -178,24 +176,24 @@ Navigation par onglets avec écrans emboîtés :
 ## 💡 Utilisation
 
 ### Découvrir des lieux
-1. Accédez à l'onglet "Discovery"
-2. Parcourez les cartes de lieux
+1. Accédez à l'onglet "Decouverte"
+2. Parcourez les évènements
 3. Utilisez la barre de recherche pour filtrer par nom ou adresse
-4. Appuyez sur une carte pour voir les détails
+4. Appuyez sur un évènements pour voir ses détails
 
 ### Consulter la carte
-1. Accédez à l'onglet "Map"
-2. La carte est centrée sur Paris
+1. Accédez à l'onglet "Carte"
+2. La carte est centrée sur Paris par défaut
 3. Consultez les lieux à proximité
 4. Tapotez les marqueurs pour voir les détails
 
 ### Gérer votre profil
-1. Accédez à l'onglet "Profile"
-2. Téléchargez une photo de profil depuis votre appareil
+1. Accédez à l'onglet "Mon Profil"
+2. Téléchargez une photo de profil depuis votre appareil ou prenez une photo
 3. Consultez vos visites planifiées
 
 ### Consulter les événements
-1. Accédez à l'onglet "Events"
+1. Accédez à l'onglet "Evenements"
 2. Explorez les événements à venir à Paris
 3. Consultez le calendrier pour les dates
 
@@ -326,8 +324,8 @@ L'API utilise la pagination avec :
 ### Limites de l'API
 
 - Débit limité (à vérifier dans la documentation officielle)
-- Données mises à jour quotidiennement
 - Les images proviennent de l'API ou d'une source par défaut
+
 ## 🗺️ Roadmap & Fonctionnalités futures
 
 ### V1.1 - Court terme (prochains sprints)
@@ -361,7 +359,7 @@ L'API utilise la pagination avec :
 
 ### L'application ne se lance pas
 ```bash
-# Nettoyer le cache Expo
+# Redémarrer l'application en nettoyant le cache Expo
 expo start -c
 ```
 
@@ -370,7 +368,7 @@ expo start -c
 - Redémarrer l'application
 
 ### La carte n'affiche pas les lieux
-- Vérifier la connexion Internet
+- Vérifier la connexion Internet ( utiliser le même Wi-Fi )
 - Vérifier que l'API OpenData de Paris est accessible
 - Consulter les logs dans la console Expo
 
@@ -387,7 +385,7 @@ Ce projet est privé et développé pour IPSSI.
 
 ## � Auteurs
 
-Projet développé en équipe pour IPSSI par :
+Projet développé en équipe par :
 
 ### **RAGUIN Hugo**
 - Initialisation et architecture du projet
