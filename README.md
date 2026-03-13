@@ -205,18 +205,11 @@ API OpenData Paris
 ### Interceptors HTTP
 
 Le client HTTP utilise des **interceptors pour la gestion des erreurs** :
+  - Gestion des erreurs réseau
+  - Gestion des timeouts (12s)
+  - Gestion des erreurs API
+  - Retour d'une classe ApiError personnalisée
 
-```typescript
-httpClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Gestion des erreurs réseau
-    // Gestion des timeouts (12s)
-    // Gestion des erreurs API
-    // Retour d'une classe ApiError personnalisée
-  }
-);
-```
 
 **Erreurs gérées :**
 - ✅ Erreurs réseau (connexion perdue)
