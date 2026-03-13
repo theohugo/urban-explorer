@@ -4,14 +4,14 @@ Une application mobile multiplateforme permettant d'explorer les lieux et évén
 
 ## 📋 Table des matières
 
-- [Fonctionnalités](#fonctionnalités)
-- [Technologies](#technologies)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Scripts disponibles](#scripts-disponibles)
-- [Structure du projet](#structure-du-projet)
-- [Architecture](#architecture)
-- [Utilisation](#utilisation)
+- Fonctionnalités
+- Technologies
+- Installation
+- Configuration
+- Scripts disponibles
+- Structure du projet
+- Architecture
+- Utilisation
 
 ## ✨ Fonctionnalités
 
