@@ -22,7 +22,6 @@ Une application mobile multiplateforme permettant d'explorer les lieux et évén
 - **💾 Visites planifiées** : Sauvegardez vos lieux à visiter
 - **👤 Profil utilisateur** : Gestion du profil avec photo personnalisée
 - **🎯 Détails des lieux** : Consultez les informations complètes de chaque lieu
-- **📱 Multi-plateforme** : Fonctionne sur iOS, Android et Web (via Expo)
 
 ## 🛠️ Technologies
 
@@ -85,22 +84,6 @@ L'application nécessite les permissions suivantes :
 - `ACCESS_FINE_LOCATION` - Localisation précise
 - `ACCESS_COARSE_LOCATION` - Localisation approximative
 - `INTERNET` - Accès à Internet
-
-## 🚀 Scripts disponibles
-
-```bash
-# Démarrer l'application en développement
-npm start
-
-# Lancer sur Android
-npm run android
-
-# Lancer sur iOS (macOS uniquement)
-npm run ios
-
-# Lancer sur Web (navigateur)
-npm run web
-```
 
 ## 📁 Structure du projet
 
@@ -202,18 +185,38 @@ Navigation par onglets avec écrans emboîtés :
 ```
 API OpenData Paris
         ↓
-   parisApi.ts
+   httpClient (Axios)
+        ↓
+   Interceptors (Gestion erreurs)
+        ↓
+   parisApi.ts (Transformation données)
         ↓
    PlacesContext ← AsyncStorage
         ↓
    Components (écrans)
 ```
 
-## 📱 Plateforme supportées
+### Interceptors HTTP
 
-- ✅ iOS 12+
-- ✅ Android 5+
-- ✅ Web (navigateurs modernes)
+Le client HTTP utilise des **interceptors pour la gestion des erreurs** :
+
+```typescript
+httpClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Gestion des erreurs réseau
+    // Gestion des timeouts (12s)
+    // Gestion des erreurs API
+    // Retour d'une classe ApiError personnalisée
+  }
+);
+```
+
+**Erreurs gérées :**
+- ✅ Erreurs réseau (connexion perdue)
+- ✅ Timeouts (12 secondes)
+- ✅ Erreurs HTTP (4xx, 5xx)
+- ✅ Messages d'erreur formatés en français
 
 ## � API Documentation
 
@@ -224,81 +227,6 @@ Urban Explorer utilise l'**API OpenData Paris** pour récupérer les données su
 **Base URL :**
 ```
 https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records
-```
-
-### Paramètres de requête
-
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `limit` | number | Nombre de résultats par page (par défaut : 50) |
-| `offset` | number | Décalage pour la pagination (commence à 0) |
-| `order_by` | string | Champ de tri (`date_start` pour les événements) |
-
-### Format des réponses
-
-#### Réponse brute de l'API
-
-```json
-{
-  "results": [
-    {
-      "id": "identifiant-unique",
-      "title": "Titre de l'événement",
-      "lead_text": "Description courte",
-      "cover_url": "https://...",
-      "address_name": "Nom du lieu",
-      "address_street": "Rue",
-      "address_zipcode": "75000",
-      "address_city": "Paris",
-      "date_start": "2026-03-15T14:00:00",
-      "date_end": "2026-03-15T18:00:00",
-      "date_description": "Dimanche 15 mars",
-      "lat_lon": {
-        "lat": 48.8566,
-        "lon": 2.3522
-      },
-      "url": "https://...",
-      "price_type": "Gratuit",
-      "audience": "Tout public",
-      "qfap_tags": "Musique"
-    }
-  ]
-}
-```
-
-#### Types TypeScript utilisés
-
-**Place (Lieu)**
-```typescript
-interface Place {
-  id: string;              // Identifiant unique
-  name: string;            // Nom du lieu
-  address: string;         // Adresse complète
-  latitude: number;        // Latitude
-  longitude: number;       // Longitude
-  imageUrl: string;        // URL de l'image
-}
-```
-
-**EventItem (Événement)**
-```typescript
-interface EventItem {
-  id: string;              // Identifiant unique
-  title: string;           // Titre de l'événement
-  summary: string;         // Description courte
-  venueName: string;       // Nom du lieu
-  address: string;         // Adresse complète
-  latitude: number;        // Latitude
-  longitude: number;       // Longitude
-  startDate: string | null; // Date de début (ISO 8601)
-  endDate: string | null;   // Date de fin (ISO 8601)
-  dateLabel: string;       // Description de la date
-  imageUrl: string;        // URL de l'image
-  category: string;        // Catégorie (ex: Musique, Théâtre)
-  audience: string;        // Public cible
-  priceLabel: string;      // Information tarifaire
-  detailsUrl: string | null; // URL pour plus de détails
-}
 ```
 
 ### Transformations appliquées
@@ -320,57 +248,6 @@ L'API utilise la pagination avec :
 - **Limit** : 50 résultats par défaut
 - **Offset** : Récupération progressive des données
 - Support du **infinite scroll** dans l'écran Discovery
-
-### Limites de l'API
-
-- Débit limité (à vérifier dans la documentation officielle)
-- Les images proviennent de l'API ou d'une source par défaut
-
-## 🗺️ Roadmap & Fonctionnalités futures
-
-### V1.1 - Court terme (prochains sprints)
-- 🔐 Authentification utilisateur avec compte personnel
-- ❤️ Système de favoris amélioré avec synchronisation cloud
-- 🏆 Badges et achievements pour les explorateurs
-- 📸 Partage de souvenirs sur les réseaux sociaux
-- 🔔 Notifications push pour les événements à proximité
-
-### V1.2 - Moyen terme
-- 🌍 Support de plusieurs villes (Lyon, Marseille, etc.)
-- 🌙 Mode sombre complet
-- 🗣️ Traduction multilingue (EN, ES, DE)
-- ⭐ Système de notes et commentaires pour les lieux
-- 📊 Statistiques utilisateur (lieux visités, distance parcourue)
-
-### V2.0 - Long terme
-- 🤖 Recommandations personnalisées avec IA
-- 👥 Fonction sociale - suivre d'autres utilisateurs
-- 🎯 Circuits touristiques pré-définis
-- 🗺️ Offline mode complet
-- 📱 App Widget pour accès rapide
-
-### Améliorations techniques
-- 🚀 Optimisation des performances et réduction du bundle
-- 🔄 Synchronisation offline-first avec WatermelonDB
-- 🧪 Suite de tests complète (Unit + E2E)
-- 📈 Analytics et monitoring
-- ♿ Accessibilité améliorée (WCAG 2.1)
-## �🐛 Dépannage
-
-### L'application ne se lance pas
-```bash
-# Redémarrer l'application en nettoyant le cache Expo
-expo start -c
-```
-
-### Les permissions ne fonctionnent pas
-- Vérifier les paramètres de l'application sur l'appareil
-- Redémarrer l'application
-
-### La carte n'affiche pas les lieux
-- Vérifier la connexion Internet ( utiliser le même Wi-Fi )
-- Vérifier que l'API OpenData de Paris est accessible
-- Consulter les logs dans la console Expo
 
 ## 📝 Notes de développement
 
