@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, startTransition, useContext, useEffect, useMemo, useState } from 'react';
 import { fetchParisEvents, fetchParisPlaces } from '../services/parisApi';
 import { loadMemories, loadPlannedVisits, loadProfilePhoto, saveMemories, savePlannedVisits, saveProfilePhoto } from '../services/storage';
-import { addVisitToCalendar } from '../services/calendarService';
+import { addVisitToCalendar, deleteEventFromCalendar } from '../services/calendarService';
 import { EventItem, Memory, PlannedVisits, Place } from '../types/place';
 
 interface PlacesContextValue {
@@ -21,6 +21,7 @@ interface PlacesContextValue {
   loadMoreEvents: () => Promise<void>;
   ensurePlacesCount: (minimumCount: number) => Promise<void>;
   planVisit: (placeId: string, date: string, time?: string) => Promise<void>;
+  deletePlannedVisit: (placeId: string) => Promise<void>;
   setProfilePhoto: (uri: string | null) => Promise<void>;
   addMemory: (memory: Memory) => Promise<void>;
   deleteMemory: (id: string) => Promise<void>;
@@ -199,17 +200,35 @@ export function PlacesProvider({ children }: PropsWithChildren) {
   async function planVisit(placeId: string, date: string, time: string = '10:00') {
     const nextVisits = {
       ...plannedVisits,
-      [placeId]: { date, time },
+      [placeId]: { date, time, calendarEventId: undefined },
     };
-
-    setPlannedVisits(nextVisits);
-    await savePlannedVisits(nextVisits);
 
     // Ajouter l'événement au calendrier du téléphone
     const place = places.find((p) => p.id === placeId);
     if (place) {
-      await addVisitToCalendar(place.name, place.address, date, time);
+      const eventId = await addVisitToCalendar(place.name, place.address, date, time);
+      if (eventId) {
+        nextVisits[placeId].calendarEventId = eventId;
+      }
     }
+
+    setPlannedVisits(nextVisits);
+    await savePlannedVisits(nextVisits);
+  }
+
+  async function deletePlannedVisit(placeId: string) {
+    const visit = plannedVisits[placeId];
+    
+    // Supprimer du calendrier du téléphone si un eventId existe
+    if (visit?.calendarEventId) {
+      await deleteEventFromCalendar(visit.calendarEventId);
+    }
+
+    // Supprimer de plannedVisits
+    const nextVisits = { ...plannedVisits };
+    delete nextVisits[placeId];
+    setPlannedVisits(nextVisits);
+    await savePlannedVisits(nextVisits);
   }
 
   async function setProfilePhoto(uri: string | null) {
@@ -247,6 +266,7 @@ export function PlacesProvider({ children }: PropsWithChildren) {
       loadMoreEvents,
       ensurePlacesCount,
       planVisit,
+      deletePlannedVisit,
       setProfilePhoto,
       addMemory,
       deleteMemory,

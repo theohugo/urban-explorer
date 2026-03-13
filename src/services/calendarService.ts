@@ -97,3 +97,23 @@ export async function addVisitToCalendar(
     notes: `Visite planifiée de ${placeName} à ${timeString}`,
   });
 }
+
+/**
+ * Supprime un événement du calendrier du téléphone
+ */
+export async function deleteEventFromCalendar(eventId: string): Promise<boolean> {
+  try {
+    const hasPermission = await requestCalendarPermission();
+    if (!hasPermission) {
+      console.warn('Permission calendrier refusée');
+      return false;
+    }
+
+    await Calendar.deleteEventAsync(eventId);
+    console.log(`✅ Événement supprimé du calendrier: ${eventId}`);
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l\'événement du calendrier:', error);
+    return false;
+  }
+}

@@ -11,7 +11,7 @@ import { Memory } from '../types/place';
 import { COLORS } from '../theme/colors';
 
 export function ProfileScreen() {
-  const { profilePhotoUri, setProfilePhoto, memories, addMemory, deleteMemory } = usePlaces();
+  const { profilePhotoUri, setProfilePhoto, memories, addMemory, deleteMemory, places, plannedVisits, deletePlannedVisit } = usePlaces();
 
   async function handleTakePhoto() {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -162,6 +162,63 @@ export function ProfileScreen() {
 
       <ProfilePhotoCard imageUri={profilePhotoUri} onTakePhoto={handleTakePhoto} onClear={handleClearPhoto} />
 
+      {/* Section Réservations */}
+      <View style={styles.reservationsSection}>
+        <View style={styles.reservationsHeader}>
+          <Text style={styles.reservationsKicker}>Mes visites prévues</Text>
+        </View>
+        <Text style={styles.reservationsTitle}>Réservations</Text>
+
+        {Object.entries(plannedVisits).length === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons name="calendar-outline" size={40} color={COLORS.border} />
+            <Text style={styles.emptyTitle}>Aucune réservation</Text>
+            <Text style={styles.emptySubtitle}>
+              Planifiez une visite dans la page Découverte ou sur la Carte pour voir vos réservations ici.
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.reservationsList}>
+            {Object.entries(plannedVisits).map(([placeId, visit]) => {
+              const place = places.find((p) => p.id === placeId);
+              if (!place) return null;
+              return (
+                <View key={placeId} style={styles.reservationCard}>
+                  <View style={styles.reservationInfo}>
+                    <Text >{place.name}</Text>
+                    <View >
+                      <Ionicons name="calendar" size={14} color={COLORS.textMuted} />
+                      <Text style={styles.reservationDate}>{visit.date} à {visit.time}</Text>
+                    </View>
+                  </View>
+                  <Pressable
+                    style={styles.deleteReservationButton}
+                    onPress={() => {
+                      Alert.alert(
+                        'Supprimer la réservation',
+                        `Êtes-vous sûr de vouloir annuler la visite de ${place.name} ?`,
+                        [
+                          { text: 'Annuler', style: 'cancel' },
+                          {
+                            text: 'Supprimer',
+                            style: 'destructive',
+                            onPress: async () => {
+                              await deletePlannedVisit(placeId);
+                            },
+                          },
+                        ]
+                      );
+                    }}
+                  >
+                    <Ionicons name="trash" size={18} color={COLORS.text} />
+                  </Pressable>
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </View>
+
       {/* Bibliothèque de souvenirs */}
       <View style={styles.librarySection}>
         <View style={styles.libraryHeader}>
@@ -286,5 +343,72 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
+  },
+  reservationsSection: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 20,
+    gap: 14,
+  },
+  reservationsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  reservationsKicker: {
+    color: COLORS.primary,
+    textTransform: 'uppercase',
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    fontSize: 11,
+    flex: 1,
+  },
+  reservationsTitle: {
+    color: COLORS.text,
+    fontSize: 24,
+    fontWeight: '900',
+    lineHeight: 30,
+  },
+  reservationsList: {
+    gap: 10,
+  },
+  reservationCard: {
+    backgroundColor: COLORS.cardSoft,
+    borderRadius: 14,
+    padding: 14,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
+  },
+  reservationInfo: {
+    flex: 1,
+    gap: 6,
+  },
+  reservationPlace: {
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  reservationDateTime: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  reservationDate: {
+    color: COLORS.textMuted,
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  deleteReservationButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#FF6B6B',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

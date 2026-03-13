@@ -74,6 +74,7 @@ export interface EventItem {
 export interface PlannedVisitData {
   date: string; // Format: "2026-03-15"
   time: string; // Format: "14:30"
+  calendarEventId?: string; // ID de l'événement au calendrier du téléphone
 }
 
 export interface PlannedVisits {
