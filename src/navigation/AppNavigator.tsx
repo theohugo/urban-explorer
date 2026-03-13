@@ -44,7 +44,10 @@ function DiscoveryStackNavigator() {
       <Stack.Screen
         name="PlaceDetail"
         component={PlaceDetailScreen}
-        options={{ title: 'Detail du lieu' }}
+        options={{
+          title: 'Detail du lieu',
+          headerBackTitle: 'Retour',
+        }}
       />
     </Stack.Navigator>
   );
