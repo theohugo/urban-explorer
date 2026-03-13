@@ -1,7 +1,9 @@
 import { RouteProp, useRoute } from '@react-navigation/native';
+import { useState } from 'react';
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { usePlaces } from '../context/PlacesContext';
+import { TimePickerModal } from '../components/TimePickerModal';
 import { COLORS } from '../theme/colors';
 import { DiscoveryStackParamList } from '../types/navigation';
 
@@ -11,11 +13,30 @@ export function PlaceDetailScreen() {
   const route = useRoute<PlaceDetailRoute>();
   const { place } = route.params;
   const { plannedVisits, planVisit } = usePlaces();
+  
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedDateForTime, setSelectedDateForTime] = useState<string | null>(null);
 
-  const selectedDate = plannedVisits[place.id];
+  const plannedVisit = plannedVisits[place.id];
+  const selectedDate = plannedVisit?.date;
+  const selectedTime = plannedVisit?.time || '10:00';
 
-  async function onDayPress(day: DateData) {
-    await planVisit(place.id, day.dateString);
+  function onDayPress(day: DateData) {
+    setSelectedDateForTime(day.dateString);
+    setShowTimePicker(true);
+  }
+
+  async function onTimeConfirm(time: string) {
+    if (selectedDateForTime) {
+      await planVisit(place.id, selectedDateForTime, time);
+      setShowTimePicker(false);
+      setSelectedDateForTime(null);
+    }
+  }
+
+  function onTimeCancel() {
+    setShowTimePicker(false);
+    setSelectedDateForTime(null);
   }
 
   return (
@@ -41,7 +62,7 @@ export function PlaceDetailScreen() {
 
         <Text style={styles.sectionTitle}>Planifier la visite</Text>
         <Text style={styles.sectionText}>
-          Choisissez une date pour reserver mentalement votre prochaine sortie.
+          Choisissez une date et une heure pour reserver mentalement votre prochaine sortie.
         </Text>
 
         <Calendar
@@ -72,12 +93,21 @@ export function PlaceDetailScreen() {
           <Text style={styles.confirmationTitle}>Confirmation</Text>
           <Text style={styles.confirmationText}>
             {selectedDate
-              ? `Visite au ${place.name} planifiee le ${selectedDate}.`
-              : `Aucune date definie pour ${place.name} pour le moment.`}
+              ? `Visite au ${place.name} planifiee le ${selectedDate} à ${selectedTime}.`
+              : `Aucune date et heure definies pour ${place.name} pour le moment.`}
           </Text>
         </View>
       </View>
       </ScrollView>
+
+      <TimePickerModal
+        visible={showTimePicker}
+        onConfirm={onTimeConfirm}
+        onCancel={onTimeCancel}
+        initialTime={selectedTime}
+        minTime="07:00"
+        maxTime="22:00"
+      />
     </SafeAreaView>
   );
 }

@@ -15,7 +15,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCameraUsageDescription": "Urban Explorer utilise la camera pour prendre votre photo de profil.",
-        "NSLocationWhenInUseUsageDescription": "Urban Explorer utilise votre position pour centrer la carte sur vous."
+        "NSLocationWhenInUseUsageDescription": "Urban Explorer utilise votre position pour centrer la carte sur vous.",
+        "NSCalendarsUsageDescription": "Urban Explorer ajoute vos visites planifiées à votre calendrier."
       }
     },
     "android": {
@@ -28,7 +29,9 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "CAMERA",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR"
       ]
     },
     "web": {

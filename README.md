@@ -4,14 +4,18 @@ Une application mobile multiplateforme permettant d'explorer les lieux et évén
 
 ## 📋 Table des matières
 
-- Fonctionnalités
-- Technologies
-- Installation
-- Configuration
-- Scripts disponibles
-- Structure du projet
-- Architecture
-- Utilisation
+- [Fonctionnalités](#fonctionnalités)
+- [Technologies](#technologies)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Scripts disponibles](#scripts-disponibles)
+- [Structure du projet](#structure-du-projet)
+- [Architecture](#architecture)
+- [Utilisation](#utilisation)
+- [API Documentation](#-api-documentation)
+- [Intégration Calendrier](#-intégration-calendrier)
+- [Roadmap](#-roadmap--fonctionnalités-futures)
+- [Auteurs](#-auteurs)
 
 ## ✨ Fonctionnalités
 
@@ -19,9 +23,10 @@ Une application mobile multiplateforme permettant d'explorer les lieux et évén
 - **🔍 Recherche et filtrage** : Trouvez rapidement des lieux par nom ou adresse
 - **🗺️ Carte interactive** : Visualisez les lieux sur une carte géolocalisée de Paris
 - **📅 Calendrier d'événements** : Consultez les événements prévus à Paris
-- **💾 Visites planifiées** : Sauvegardez vos lieux à visiter
+- **💾 Visites planifiées** : Sauvegardez vos lieux à visiter ✨ **Intégrés automatiquement à votre calendrier téléphone** + **Sélection d'heure incluse**
 - **👤 Profil utilisateur** : Gestion du profil avec photo personnalisée
 - **🎯 Détails des lieux** : Consultez les informations complètes de chaque lieu
+- **⏰ Sélecteur d'heure** : Choisissez l'heure de votre visite lors de la réservation
 
 ## 🛠️ Technologies
 
@@ -35,6 +40,7 @@ Une application mobile multiplateforme permettant d'explorer les lieux et évén
 - **react-native-maps** - Affichage de cartes interactives
 - **axios** - Client HTTP pour les API
 - **react-native-calendars** - Calendrier pour les événements
+- **expo-calendar** - Intégration avec le calendrier du téléphone
 - **@react-native-async-storage/async-storage** - Stockage persistant
 - **expo-location** - Géolocalisation
 - **expo-image-picker** - Sélection de photos
@@ -234,7 +240,26 @@ https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/r
 1. **Filtrage des données invalides** - Seuls les enregistrements avec latitude/longitude valides sont conservés
 2. **Déduplication** - Les lieux en doublon sont supprimés
 3. **Normalisation des adresses** - Les adresses sont construites à partir des champs : `address_street + address_zipcode + address_city`
-4. **Fallback images** - Si pas d'image, une image placeholder est générée via Picsum.photos
+4. **Extraction des horaires** ✨ - Les heures sont extraites de `date_start` et `date_end` au format `HH:MM`
+5. **Fallback images** - Si pas d'image, une image placeholder est générée via Picsum.photos
+
+### Horaires depuis l'API
+
+L'API fournit les horaires de début et fin pour chaque événement :
+
+```json
+{
+  "date_start": "2026-05-09T16:00:00+00:00",
+  "date_end": "2026-05-09T17:30:00+00:00",
+  "date_description": "Le samedi 09 mai 2026 de 15h00 à 16h30"
+}
+```
+
+Ces horaires sont **automatiquement extraits** :
+- **startTime** : `16:00` (extrait de date_start)
+- **endTime** : `17:30` (extrait de date_end)
+
+Ces horaires valident ensuite les choix de l'utilisateur dans le `TimePickerModal`
 
 ### Gestion des erreurs
 
@@ -249,7 +274,84 @@ L'API utilise la pagination avec :
 - **Offset** : Récupération progressive des données
 - Support du **infinite scroll** dans l'écran Discovery
 
-## 📝 Notes de développement
+## � Intégration Calendrier
+
+### Vue d'ensemble
+
+Urban Explorer intègre automatiquement vos visites planifiées dans le calendrier de votre téléphone. Quand vous réservez une date pour un lieu, un modal s'ouvre pour que vous choisissiez l'heure, puis un événement est créé dans votre calendrier système.
+
+### Sélecteur d'heure (TimePickerModal)
+
+Composant personnalisé qui s'affiche en modal bottom-sheet :
+
+```typescript
+// Format d'utilisation
+<TimePickerModal
+  visible={showTimePicker}
+  onConfirm={onTimeConfirm}
+  onCancel={onTimeCancel}
+  initialTime="14:30"
+  minTime="07:00"  // ← Horaires du lieu depuis l'API
+  maxTime="22:00"  // ← Horaires du lieu depuis l'API
+/>
+```
+
+**Fonctionnalités :**
+- Sélection des heures : 0-23h
+- Sélection des minutes : 0, 15, 30, 45 (par pas de 15)
+- **Validation des horaires** : Seulement les horaires valides sont disponibles
+- **Récupération depuis l'API** : Les horaires de l'événement viennent de `date_start` et `date_end`
+- **Info affichée** : "📅 Horaires du lieu : 07:00 - 22:00"
+- Aperçu en temps réel de l'heure sélectionnée
+- Interface intuitive avec animations
+- Design cohérent avec l'application
+
+### Service de Calendrier (`calendarService.ts`)
+
+Le service gère l'interaction avec le calendrier de l'appareil :
+
+```typescript
+// Ajouter une visite au calendrier
+await addVisitToCalendar(placeName, placeAddress, dateString);
+
+// Format de date : "2026-03-15" (ISO 8601)
+```
+
+### Permissions requises
+
+**iOS** (`app.json`) :
+- `NSCalendarsUsageDescription` - Accès au calendrier
+
+**Android** (`app.json`) :
+- `READ_CALENDAR` - Lecture du calendrier
+- `WRITE_CALENDAR` - Écriture d'événements
+
+### Flux d'ajout d'événement
+
+1. **Utilisateur choisit une date** → Écran PlaceDetailScreen
+2. **TimePickerModal s'ouvre** → Sélection de l'heure (0-23h, minutes par pas de 15)
+3. **Utilisateur confirme l'heure** → Appel de `planVisit(date, time)`
+4. **Sauvegarde locale** → AsyncStorage + PlacesContext
+5. **Ajout au calendrier** → calendarService.addVisitToCalendar(date, **time**)
+6. **Permission demandée** → Si première fois
+7. **Événement créé** → Calendrier système avec l'heure exacte
+
+### Détails de l'événement créé
+
+- **Titre** : 📍 [Nom du lieu]
+- **Lieu** : [Adresse complète du lieu]
+- **Date/Heure** : La date ET heure choisies par l'utilisateur
+- **Durée** : 2 heures par défaut
+- **Fuseau horaire** : Europe/Paris
+- **Notes** : "Visite planifiée de [Nom] à [Heure]"
+
+### Gestion des erreurs
+
+- Permission refusée → L'événement n'est pas créé, mais la visite reste planifiée
+- Pas de calendrier disponible → Fallback gracieux
+- Les erreurs sont loggées en console pour le débogage
+
+## �📝 Notes de développement
 
 - L'application utilise TypeScript pour une meilleure qualité de code
 - Les données sont cachées avec AsyncStorage pour les performances

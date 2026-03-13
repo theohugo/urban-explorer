@@ -61,6 +61,8 @@ export interface EventItem {
   longitude: number;
   startDate: string | null;
   endDate: string | null;
+  startTime?: string; // Format: "14:30"
+  endTime?: string;   // Format: "16:30"
   dateLabel: string;
   imageUrl: string;
   category: string;
@@ -69,8 +71,13 @@ export interface EventItem {
   detailsUrl: string | null;
 }
 
+export interface PlannedVisitData {
+  date: string; // Format: "2026-03-15"
+  time: string; // Format: "14:30"
+}
+
 export interface PlannedVisits {
-  [placeId: string]: string;
+  [placeId: string]: PlannedVisitData;
 }
 
 export interface MemoryLocation {

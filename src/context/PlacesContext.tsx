@@ -1,6 +1,7 @@
 import { PropsWithChildren, createContext, startTransition, useContext, useEffect, useMemo, useState } from 'react';
 import { fetchParisEvents, fetchParisPlaces } from '../services/parisApi';
 import { loadMemories, loadPlannedVisits, loadProfilePhoto, saveMemories, savePlannedVisits, saveProfilePhoto } from '../services/storage';
+import { addVisitToCalendar } from '../services/calendarService';
 import { EventItem, Memory, PlannedVisits, Place } from '../types/place';
 
 interface PlacesContextValue {
@@ -195,14 +196,20 @@ export function PlacesProvider({ children }: PropsWithChildren) {
     }
   }
 
-  async function planVisit(placeId: string, date: string) {
+  async function planVisit(placeId: string, date: string, time: string = '10:00') {
     const nextVisits = {
       ...plannedVisits,
-      [placeId]: date,
+      [placeId]: { date, time },
     };
 
     setPlannedVisits(nextVisits);
     await savePlannedVisits(nextVisits);
+
+    // Ajouter l'événement au calendrier du téléphone
+    const place = places.find((p) => p.id === placeId);
+    if (place) {
+      await addVisitToCalendar(place.name, place.address, date, time);
+    }
   }
 
   async function setProfilePhoto(uri: string | null) {

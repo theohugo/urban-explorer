@@ -12,6 +12,21 @@ function toAddress(record: ParisEventRecord) {
     .join(', ');
 }
 
+/**
+ * Extrait l'heure au format HH:MM d'une date ISO
+ */
+function extractTimeFromISO(isoString: string | null | undefined): string | undefined {
+  if (!isoString) return undefined;
+  try {
+    const date = new Date(isoString);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  } catch {
+    return undefined;
+  }
+}
+
 function toPlace(record: ParisEventRecord, index: number): Place | null {
   const latitude = record.lat_lon?.lat;
   const longitude = record.lat_lon?.lon;
@@ -51,6 +66,9 @@ function toEvent(record: ParisEventRecord, index: number): EventItem | null {
     return null;
   }
 
+  const startTime = extractTimeFromISO(record.date_start);
+  const endTime = extractTimeFromISO(record.date_end);
+
   return {
     id: record.id ?? `event-${index}`,
     title: record.title,
@@ -61,6 +79,8 @@ function toEvent(record: ParisEventRecord, index: number): EventItem | null {
     longitude,
     startDate: record.date_start ?? null,
     endDate: record.date_end ?? null,
+    startTime,
+    endTime,
     dateLabel: record.date_description ?? 'Date a confirmer',
     imageUrl: record.cover_url ?? `https://picsum.photos/seed/urban-explorer-event-${index}/600/400`,
     category: record.qfap_tags ?? 'Sortie',

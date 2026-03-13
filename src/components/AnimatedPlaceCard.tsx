@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Place } from '../types/place';
+import { Place, PlannedVisitData } from '../types/place';
 import { COLORS } from '../theme/colors';
 
 interface AnimatedPlaceCardProps {
   place: Place;
   index: number;
   onPress: () => void;
-  plannedDate?: string;
+  plannedDate?: PlannedVisitData;
 }
 
 export function AnimatedPlaceCard({ place, index, onPress, plannedDate }: AnimatedPlaceCardProps) {
@@ -38,7 +38,7 @@ export function AnimatedPlaceCard({ place, index, onPress, plannedDate }: Animat
         <View style={styles.body}>
           <View style={styles.kickerRow}>
             <Text style={styles.kicker}>Lieu culturel</Text>
-            {plannedDate ? <Text style={styles.badge}>Visite {plannedDate}</Text> : null}
+            {plannedDate ? <Text style={styles.badge}>Visite {plannedDate.date} à {plannedDate.time}</Text> : null}
           </View>
           <Text style={styles.title}>{place.name}</Text>
           <Text style={styles.address}>{place.address}</Text>
