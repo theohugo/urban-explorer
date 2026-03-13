@@ -14,6 +14,11 @@ export function LoadingState() {
 const styles = StyleSheet.create({
   container: {
     marginTop: 32,
+    padding: 24,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
     alignItems: 'center',
     gap: 12,
   },

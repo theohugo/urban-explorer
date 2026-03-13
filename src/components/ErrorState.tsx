@@ -48,13 +48,15 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'flex-start',
     marginTop: 8,
-    backgroundColor: COLORS.primary,
+    backgroundColor: 'rgba(255, 122, 89, 0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 122, 89, 0.26)',
     borderRadius: 14,
     paddingHorizontal: 18,
     paddingVertical: 12,
   },
   buttonText: {
-    color: COLORS.text,
+    color: COLORS.primary,
     fontWeight: '800',
   },
 });

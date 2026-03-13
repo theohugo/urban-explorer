@@ -221,7 +221,7 @@ export function MapScreen() {
                         )
                       }
                     >
-                      <Ionicons name="map-outline" size={14} color={COLORS.textDark} />
+                      <Ionicons name="map-outline" size={14} color={COLORS.text} />
                       <Text style={styles.openMapsText}>Voir sur OpenStreetMap</Text>
                     </Pressable>
                   )}
@@ -405,13 +405,15 @@ const styles = StyleSheet.create({
   },
   linkButton: {
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.cardSoft,
+    backgroundColor: 'rgba(244, 201, 93, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(244, 201, 93, 0.28)',
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
   linkButtonText: {
-    color: COLORS.textDark,
+    color: COLORS.text,
     fontWeight: '800',
   },
 
@@ -480,13 +482,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 7,
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.cardSoft,
+    backgroundColor: 'rgba(244, 201, 93, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(244, 201, 93, 0.28)',
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
   openMapsText: {
-    color: COLORS.textDark,
+    color: COLORS.text,
     fontWeight: '800',
     fontSize: 13,
   },

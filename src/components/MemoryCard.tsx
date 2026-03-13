@@ -63,13 +63,18 @@ export function MemoryCard({ memory, onDelete }: MemoryCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.borderSoft,
     overflow: 'hidden',
     flexDirection: 'row',
     alignItems: 'flex-start',
+    shadowColor: COLORS.shadow,
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
   photo: {
     width: 100,
@@ -113,5 +118,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 10,
     alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255, 125, 125, 0.10)',
+    borderBottomLeftRadius: 12,
   },
 });
