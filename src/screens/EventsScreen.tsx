@@ -1,6 +1,7 @@
 import { useDeferredValue, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Linking, Pressable, RefreshControl, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ErrorState } from '../components/ErrorState';
 import { HeroHeader } from '../components/HeroHeader';
 import { LoadingState } from '../components/LoadingState';
@@ -40,7 +41,12 @@ export function EventsScreen() {
     return (
       <View style={styles.card}>
         <Image source={{ uri: item.imageUrl }} style={styles.image} />
-        <View style={styles.body}>
+        <LinearGradient
+          colors={['#12324A', '#0A1828']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.body}
+        >
           <View style={styles.row}>
             <Text style={styles.category}>{item.category}</Text>
             <Text style={styles.price}>{item.priceLabel}</Text>
@@ -54,7 +60,7 @@ export function EventsScreen() {
           <Pressable style={styles.button} onPress={() => openEvent(item.detailsUrl)} disabled={!item.detailsUrl}>
             <Text style={styles.buttonText}>Voir l evenement</Text>
           </Pressable>
-        </View>
+        </LinearGradient>
       </View>
     );
   }
@@ -133,10 +139,17 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   card: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.backgroundSecondary,
     borderRadius: 26,
     overflow: 'hidden',
     marginBottom: 18,
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
+    shadowColor: COLORS.shadow,
+    shadowOpacity: 1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 8,
   },
   image: {
     width: '100%',
@@ -153,32 +166,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   category: {
-    color: COLORS.primary,
+    color: COLORS.secondary,
     fontSize: 12,
     fontWeight: '800',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   price: {
-    color: COLORS.textSoftDark,
+    color: COLORS.accent,
     fontSize: 12,
     fontWeight: '700',
   },
   title: {
-    color: COLORS.textDark,
+    color: COLORS.text,
     fontSize: 22,
     fontWeight: '800',
   },
   venue: {
-    color: COLORS.textDark,
+    color: COLORS.text,
     fontWeight: '700',
   },
   text: {
-    color: COLORS.textSoftDark,
+    color: COLORS.textMuted,
     lineHeight: 22,
   },
   meta: {
-    color: COLORS.textSoftDark,
+    color: COLORS.textMuted,
     lineHeight: 20,
   },
   audience: {
@@ -188,7 +201,9 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 8,
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.textDark,
+    backgroundColor: 'rgba(244, 201, 93, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(244, 201, 93, 0.28)',
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 10,

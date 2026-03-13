@@ -4,7 +4,7 @@ import { EventItem, ParisEventRecord, ParisEventsResponse, Place } from '../type
 
 const EVENTS_API_BASE_URL =
   'https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records';
-const PAGE_SIZE = 50;
+export const PARIS_API_PAGE_SIZE = 50;
 
 function toAddress(record: ParisEventRecord) {
   return [record.address_street, record.address_zipcode, record.address_city]
@@ -115,7 +115,7 @@ function buildEventsUrl(offset: number, limit: number) {
   return `${EVENTS_API_BASE_URL}?${params.toString()}`;
 }
 
-async function fetchParisEventRecords(offset = 0, limit = PAGE_SIZE) {
+async function fetchParisEventRecords(offset = 0, limit = PARIS_API_PAGE_SIZE) {
   const response = await httpClient.get<ParisEventsResponse>(buildEventsUrl(offset, limit));
   const data = response.data;
   return data.results ?? [];

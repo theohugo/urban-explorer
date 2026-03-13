@@ -1,32 +1,21 @@
 import React, { useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-} from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS } from '../theme/colors';
 
 interface TimePickerModalProps {
   visible: boolean;
   onConfirm: (time: string) => void;
   onCancel: () => void;
-  initialTime?: string; // Format: "14:30"
-  minTime?: string;     // Format: "09:00" - heure min de l'événement
-  maxTime?: string;     // Format: "18:30" - heure max de l'événement
+  initialTime?: string;
+  minTime?: string;
+  maxTime?: string;
 }
 
 function timeStringToMinutes(timeStr: string): number {
   const [h, m] = timeStr.split(':').map(Number);
   return h * 60 + m;
-}
-
-function minutesToTimeString(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
 export function TimePickerModal({
@@ -37,39 +26,34 @@ export function TimePickerModal({
   minTime,
   maxTime,
 }: TimePickerModalProps) {
-  const [hours, setHours] = useState<number>(parseInt(initialTime.split(':')[0]));
-  const [minutes, setMinutes] = useState<number>(parseInt(initialTime.split(':')[1]));
+  const [hours, setHours] = useState<number>(parseInt(initialTime.split(':')[0], 10));
+  const [minutes, setMinutes] = useState<number>(parseInt(initialTime.split(':')[1], 10));
 
-  // Calculs des limites min/max
   const minMinutes = minTime ? timeStringToMinutes(minTime) : 0;
-  const maxMinutes = maxTime ? timeStringToMinutes(maxTime) : 1439; // 23:59
+  const maxMinutes = maxTime ? timeStringToMinutes(maxTime) : 1439;
 
   const hoursList = Array.from({ length: 24 }, (_, i) => i);
   const minutesList = [0, 15, 30, 45];
 
-  // Filtrer les heures valides
   const validHours = hoursList.filter((hour) => {
     const hourStartMin = hour * 60;
     const hourEndMin = (hour + 1) * 60 - 1;
     return hourStartMin <= maxMinutes && hourEndMin >= minMinutes;
   });
 
-  // Filtrer les minutes valides pour l'heure courante
   const validMinutes = minutesList.filter((minute) => {
     const timeInMinutes = hours * 60 + minute;
     return timeInMinutes >= minMinutes && timeInMinutes <= maxMinutes;
   });
 
-  // Si l'heure actuelle n'est pas valide, utiliser la première heure valide
   if (!validHours.includes(hours) && validHours.length > 0) {
     setHours(validHours[0]);
   }
 
-  // Si les minutes ne sont pas valides, utiliser les premières minutes valides
   if (
     validMinutes.length > 0 &&
     !validMinutes.includes(minutes) &&
-    hours === parseInt(initialTime.split(':')[0])
+    hours === parseInt(initialTime.split(':')[0], 10)
   ) {
     setMinutes(validMinutes[0]);
   }
@@ -81,7 +65,7 @@ export function TimePickerModal({
 
   function handleHourChange(hour: number) {
     setHours(hour);
-    // Réinitialiser les minutes si elles ne sont plus valides
+
     const timeInMinutes = hour * 60 + minutes;
     const maxMinForHour = Math.min((hour + 1) * 60 - 1, maxMinutes);
     const minMinForHour = Math.max(hour * 60, minMinutes);
@@ -90,6 +74,7 @@ export function TimePickerModal({
       const validMin = minutesList.find(
         (m) => hour * 60 + m >= minMinForHour && hour * 60 + m <= maxMinForHour
       );
+
       if (validMin !== undefined) {
         setMinutes(validMin);
       }
@@ -97,30 +82,27 @@ export function TimePickerModal({
   }
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onCancel}
-    >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <Pressable style={styles.overlay} onPress={onCancel}>
-        <View style={styles.container}>
+        <LinearGradient
+          colors={['#12324A', '#0A1828']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.container}
+        >
           <Text style={styles.title}>Choisir l'heure de visite</Text>
 
-          {minTime && maxTime && (
-            <Text style={styles.info}>
-              📅 Horaires du lieu : {minTime} - {maxTime}
-            </Text>
-          )}
+          {minTime && maxTime ? (
+            <View style={styles.info}>
+              <Ionicons name="calendar-outline" size={14} color={COLORS.accent} />
+              <Text style={styles.infoText}>Horaires du lieu : {minTime} - {maxTime}</Text>
+            </View>
+          ) : null}
 
           <View style={styles.timePickerContainer}>
-            {/* Heures */}
             <View style={styles.column}>
               <Text style={styles.label}>Heures</Text>
-              <ScrollView
-                style={styles.scrollView}
-                showsVerticalScrollIndicator={false}
-              >
+              <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
                 {validHours.map((hour) => (
                   <Pressable
                     key={hour}
@@ -145,13 +127,9 @@ export function TimePickerModal({
               </ScrollView>
             </View>
 
-            {/* Minutes */}
             <View style={styles.column}>
               <Text style={styles.label}>Minutes</Text>
-              <ScrollView
-                style={styles.scrollView}
-                showsVerticalScrollIndicator={false}
-              >
+              <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
                 {validMinutes.map((minute) => (
                   <Pressable
                     key={minute}
@@ -175,27 +153,22 @@ export function TimePickerModal({
             </View>
           </View>
 
-          {/* Affichage de l'heure sélectionnée */}
           <View style={styles.previewContainer}>
-            <Text style={styles.previewLabel}>Heure sélectionnée :</Text>
+            <Text style={styles.previewLabel}>Heure selectionnee</Text>
             <Text style={styles.previewTime}>
               {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}
             </Text>
           </View>
 
-          {/* Boutons */}
           <View style={styles.buttonContainer}>
             <Pressable style={[styles.button, styles.cancelButton]} onPress={onCancel}>
               <Text style={styles.cancelButtonText}>Annuler</Text>
             </Pressable>
-            <Pressable
-              style={[styles.button, styles.confirmButton]}
-              onPress={handleConfirm}
-            >
+            <Pressable style={[styles.button, styles.confirmButton]} onPress={handleConfirm}>
               <Text style={styles.confirmButtonText}>Confirmer</Text>
             </Pressable>
           </View>
-        </View>
+        </LinearGradient>
       </Pressable>
     </Modal>
   );
@@ -204,42 +177,53 @@ export function TimePickerModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(2, 8, 14, 0.68)',
     justifyContent: 'flex-end',
   },
   container: {
-    backgroundColor: COLORS.cardSoft,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingTop: 24,
     paddingHorizontal: 20,
     paddingBottom: 30,
     gap: 20,
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
-    color: COLORS.textDark,
+    fontWeight: '800',
+    color: COLORS.text,
     textAlign: 'center',
   },
   info: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: COLORS.primary,
-    textAlign: 'center',
-    backgroundColor: COLORS.background,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(7, 19, 31, 0.34)',
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  infoText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.accent,
+    textAlign: 'center',
   },
   timePickerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     height: 250,
-    backgroundColor: COLORS.background,
-    borderRadius: 16,
+    backgroundColor: 'rgba(7, 19, 31, 0.34)',
+    borderRadius: 20,
     padding: 12,
     gap: 16,
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
   },
   column: {
     flex: 1,
@@ -247,11 +231,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSoftDark,
+    fontWeight: '700',
+    color: COLORS.textMuted,
     textAlign: 'center',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   scrollView: {
     flex: 1,
@@ -259,7 +243,7 @@ const styles = StyleSheet.create({
   timeOption: {
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginVertical: 4,
   },
   timeOptionSelected: {
@@ -270,32 +254,33 @@ const styles = StyleSheet.create({
   },
   timeOptionText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.textSoftDark,
+    fontWeight: '700',
+    color: COLORS.textMuted,
     textAlign: 'center',
   },
   timeOptionTextSelected: {
-    color: 'white',
-    fontWeight: '700',
+    color: COLORS.text,
   },
   previewContainer: {
-    backgroundColor: COLORS.background,
-    borderRadius: 12,
+    backgroundColor: 'rgba(7, 19, 31, 0.34)',
+    borderRadius: 18,
     padding: 16,
     alignItems: 'center',
     gap: 8,
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
   },
   previewLabel: {
     fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSoftDark,
+    fontWeight: '700',
+    color: COLORS.textMuted,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   previewTime: {
     fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.primary,
+    fontWeight: '900',
+    color: COLORS.accent,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -303,27 +288,27 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 13,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: COLORS.cardSoft,
-    borderWidth: 1.5,
-    borderColor: COLORS.textSoftDark,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
   },
   confirmButton: {
     backgroundColor: COLORS.primary,
   },
   cancelButtonText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textSoftDark,
+    fontWeight: '800',
+    color: COLORS.textMuted,
   },
   confirmButtonText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: 'white',
+    fontWeight: '800',
+    color: COLORS.text,
   },
 });

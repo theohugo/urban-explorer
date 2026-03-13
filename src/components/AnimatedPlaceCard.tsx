@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Place, PlannedVisitData } from '../types/place';
 import { COLORS } from '../theme/colors';
@@ -34,23 +36,38 @@ export function AnimatedPlaceCard({ place, index, onPress, plannedDate }: Animat
   return (
     <Animated.View style={[styles.wrapper, { opacity, transform: [{ translateY }] }]}>
       <Pressable style={styles.card} onPress={onPress}>
-        <Image source={{ uri: place.imageUrl }} style={styles.image} />
-        <View style={styles.body}>
-          <View style={styles.kickerRow}>
+        <View style={styles.imageWrap}>
+          <Image source={{ uri: place.imageUrl }} style={styles.image} />
+          <View style={styles.imageOverlay} />
+          <View style={styles.imageTopRow}>
             <Text style={styles.kicker}>Lieu culturel</Text>
-            {plannedDate ? <Text style={styles.badge}>Visite {plannedDate.date} à {plannedDate.time}</Text> : null}
-          </View>
-          <Text style={styles.title}>{place.name}</Text>
-          <Text style={styles.address}>{place.address}</Text>
-          <View style={styles.footer}>
-            <Text style={styles.coordinates}>
-              {place.latitude.toFixed(3)}, {place.longitude.toFixed(3)}
-            </Text>
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>Voir plus</Text>
-            </View>
+            {plannedDate ? <Text style={styles.badge}>Visite {plannedDate.date} a {plannedDate.time}</Text> : null}
           </View>
         </View>
+
+        <LinearGradient
+          colors={['#12324A', '#0A1828']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.body}
+        >
+          <Text style={styles.title}>{place.name}</Text>
+          <Text style={styles.address}>{place.address}</Text>
+
+          <View style={styles.footer}>
+            <View style={styles.coordinatesRow}>
+              <Ionicons name="location-outline" size={14} color={COLORS.secondary} />
+              <Text style={styles.coordinates}>
+                {place.latitude.toFixed(3)}, {place.longitude.toFixed(3)}
+              </Text>
+            </View>
+
+            <View style={styles.button}>
+              <Text style={styles.buttonText}>Voir plus</Text>
+              <Ionicons name="arrow-forward" size={14} color={COLORS.text} />
+            </View>
+          </View>
+        </LinearGradient>
       </Pressable>
     </Animated.View>
   );
@@ -61,39 +78,56 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   card: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.backgroundSecondary,
     borderRadius: 26,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: COLORS.borderSoft,
     shadowColor: COLORS.shadow,
     shadowOpacity: 1,
     shadowRadius: 22,
     shadowOffset: { width: 0, height: 14 },
     elevation: 9,
   },
+  imageWrap: {
+    position: 'relative',
+  },
   image: {
     width: '100%',
     height: 186,
+  },
+  imageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(7, 19, 31, 0.24)',
+  },
+  imageTopRow: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    right: 14,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 10,
   },
   body: {
     padding: 18,
     gap: 10,
   },
-  kickerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-  },
   kicker: {
-    color: COLORS.primary,
-    fontSize: 12,
+    color: COLORS.text,
+    fontSize: 11,
     fontWeight: '800',
     textTransform: 'uppercase',
     letterSpacing: 1,
+    backgroundColor: 'rgba(7, 19, 31, 0.72)',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 999,
   },
   badge: {
-    color: COLORS.textDark,
-    backgroundColor: '#FFE2D8',
+    color: COLORS.text,
+    backgroundColor: 'rgba(255, 122, 89, 0.88)',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -101,12 +135,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   title: {
-    color: COLORS.textDark,
+    color: COLORS.text,
     fontSize: 22,
     fontWeight: '800',
   },
   address: {
-    color: COLORS.textSoftDark,
+    color: COLORS.textMuted,
     lineHeight: 22,
   },
   footer: {
@@ -114,17 +148,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 12,
+    marginTop: 4,
+  },
+  coordinatesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flex: 1,
   },
   coordinates: {
-    color: COLORS.textSoftDark,
+    color: COLORS.textMuted,
     fontSize: 12,
     fontWeight: '700',
   },
   button: {
-    backgroundColor: COLORS.textDark,
+    backgroundColor: 'rgba(244, 201, 93, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(244, 201, 93, 0.28)',
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   buttonText: {
     color: COLORS.text,

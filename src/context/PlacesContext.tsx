@@ -1,5 +1,5 @@
 import { PropsWithChildren, createContext, startTransition, useContext, useEffect, useMemo, useState } from 'react';
-import { fetchParisEvents, fetchParisPlaces } from '../services/parisApi';
+import { fetchParisEvents, fetchParisPlaces, PARIS_API_PAGE_SIZE } from '../services/parisApi';
 import { loadMemories, loadPlannedVisits, loadProfilePhoto, saveMemories, savePlannedVisits, saveProfilePhoto } from '../services/storage';
 import { addVisitToCalendar, deleteEventFromCalendar } from '../services/calendarService';
 import { EventItem, Memory, PlannedVisits, Place } from '../types/place';
@@ -37,6 +37,8 @@ export function PlacesProvider({ children }: PropsWithChildren) {
   const [isLoadingMoreEvents, setIsLoadingMoreEvents] = useState(false);
   const [hasMorePlaces, setHasMorePlaces] = useState(true);
   const [hasMoreEvents, setHasMoreEvents] = useState(true);
+  const [placesOffset, setPlacesOffset] = useState(0);
+  const [eventsOffset, setEventsOffset] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [plannedVisits, setPlannedVisits] = useState<PlannedVisits>({});
   const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null);
@@ -73,6 +75,8 @@ export function PlacesProvider({ children }: PropsWithChildren) {
         setEvents(nextEvents);
         setHasMorePlaces(nextPlaces.length > 0);
         setHasMoreEvents(nextEvents.length > 0);
+        setPlacesOffset(PARIS_API_PAGE_SIZE);
+        setEventsOffset(PARIS_API_PAGE_SIZE);
       });
     } catch (caughtError) {
       const message =
@@ -91,7 +95,7 @@ export function PlacesProvider({ children }: PropsWithChildren) {
     setIsLoadingMorePlaces(true);
 
     try {
-      const nextPlaces = await fetchParisPlaces(places.length);
+      const nextPlaces = await fetchParisPlaces(placesOffset);
 
       startTransition(() => {
         if (nextPlaces.length === 0) {
@@ -114,6 +118,7 @@ export function PlacesProvider({ children }: PropsWithChildren) {
 
           return mergedPlaces;
         });
+        setPlacesOffset((currentOffset) => currentOffset + PARIS_API_PAGE_SIZE);
       });
     } finally {
       setIsLoadingMorePlaces(false);
@@ -128,7 +133,7 @@ export function PlacesProvider({ children }: PropsWithChildren) {
     setIsLoadingMoreEvents(true);
 
     try {
-      const nextEvents = await fetchParisEvents(events.length);
+      const nextEvents = await fetchParisEvents(eventsOffset);
 
       startTransition(() => {
         if (nextEvents.length === 0) {
@@ -149,6 +154,7 @@ export function PlacesProvider({ children }: PropsWithChildren) {
 
           return mergedEvents;
         });
+        setEventsOffset((currentOffset) => currentOffset + PARIS_API_PAGE_SIZE);
       });
     } finally {
       setIsLoadingMoreEvents(false);
@@ -161,13 +167,14 @@ export function PlacesProvider({ children }: PropsWithChildren) {
     }
 
     let currentPlaces = places;
+    let currentOffset = placesOffset;
     let currentHasMorePlaces: boolean = hasMorePlaces;
 
     while (currentPlaces.length < minimumCount && currentHasMorePlaces) {
       setIsLoadingMorePlaces(true);
 
       try {
-        const nextPlaces = await fetchParisPlaces(currentPlaces.length);
+        const nextPlaces = await fetchParisPlaces(currentOffset);
 
         if (nextPlaces.length === 0) {
           currentHasMorePlaces = false;
@@ -188,8 +195,10 @@ export function PlacesProvider({ children }: PropsWithChildren) {
         }
 
         currentPlaces = mergedPlaces;
+        currentOffset += PARIS_API_PAGE_SIZE;
         startTransition(() => {
           setPlaces(mergedPlaces);
+          setPlacesOffset(currentOffset);
         });
       } finally {
         setIsLoadingMorePlaces(false);
