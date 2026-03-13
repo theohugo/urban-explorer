@@ -243,24 +243,6 @@ https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/r
 4. **Extraction des horaires** ✨ - Les heures sont extraites de `date_start` et `date_end` au format `HH:MM`
 5. **Fallback images** - Si pas d'image, une image placeholder est générée via Picsum.photos
 
-### Horaires depuis l'API
-
-L'API fournit les horaires de début et fin pour chaque événement :
-
-```json
-{
-  "date_start": "2026-05-09T16:00:00+00:00",
-  "date_end": "2026-05-09T17:30:00+00:00",
-  "date_description": "Le samedi 09 mai 2026 de 15h00 à 16h30"
-}
-```
-
-Ces horaires sont **automatiquement extraits** :
-- **startTime** : `16:00` (extrait de date_start)
-- **endTime** : `17:30` (extrait de date_end)
-
-Ces horaires valident ensuite les choix de l'utilisateur dans le `TimePickerModal`
-
 ### Gestion des erreurs
 
 - En cas d'erreur API, les **données de fallback** (mockées) sont utilisées comme secours
@@ -278,7 +260,7 @@ L'API utilise la pagination avec :
 
 ### Vue d'ensemble
 
-Urban Explorer intègre automatiquement vos visites planifiées dans le calendrier de votre téléphone. Quand vous réservez une date pour un lieu, un modal s'ouvre pour que vous choisissiez l'heure, puis un événement est créé dans votre calendrier système.
+Urban Explorer intègre automatiquement vos visites planifiées dans le calendrier de votre téléphone. Quand vous réservez une date pour un lieu, un modal s'ouvre pour que vous choisissiez l'heure, puis un événement est créé dans votre calendrier.
 
 ### Sélecteur d'heure (TimePickerModal)
 
@@ -300,11 +282,9 @@ Composant personnalisé qui s'affiche en modal bottom-sheet :
 - Sélection des heures : 0-23h
 - Sélection des minutes : 0, 15, 30, 45 (par pas de 15)
 - **Validation des horaires** : Seulement les horaires valides sont disponibles
-- **Récupération depuis l'API** : Les horaires de l'événement viennent de `date_start` et `date_end`
 - **Info affichée** : "📅 Horaires du lieu : 07:00 - 22:00"
 - Aperçu en temps réel de l'heure sélectionnée
 - Interface intuitive avec animations
-- Design cohérent avec l'application
 
 ### Service de Calendrier (`calendarService.ts`)
 
@@ -334,7 +314,7 @@ await addVisitToCalendar(placeName, placeAddress, dateString);
 4. **Sauvegarde locale** → AsyncStorage + PlacesContext
 5. **Ajout au calendrier** → calendarService.addVisitToCalendar(date, **time**)
 6. **Permission demandée** → Si première fois
-7. **Événement créé** → Calendrier système avec l'heure exacte
+7. **Événement créé** → Calendrier système avec l'heure exacte de réservation
 
 ### Détails de l'événement créé
 
@@ -381,4 +361,5 @@ Projet développé en équipe par :
 ### **TALEB Amine**
 - Navigation React Navigation
 - Gestion complète de la carte interactive
+- Réservation des événement et ajout dans le calendrier
 - Rédaction du README
