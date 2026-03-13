@@ -2,21 +2,6 @@
 
 Une application mobile multiplateforme permettant d'explorer les lieux et événements intéressants à Paris avec une expérience utilisateur fluide et intuitive.
 
-## 📋 Table des matières
-
-- [Fonctionnalités](#fonctionnalités)
-- [Technologies](#technologies)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Scripts disponibles](#scripts-disponibles)
-- [Structure du projet](#structure-du-projet)
-- [Architecture](#architecture)
-- [Utilisation](#utilisation)
-- [API Documentation](#-api-documentation)
-- [Intégration Calendrier](#-intégration-calendrier)
-- [Roadmap](#-roadmap--fonctionnalités-futures)
-- [Auteurs](#-auteurs)
-
 ## ✨ Fonctionnalités
 
 - **📍 Découverte de lieux** : Parcourez les lieux intéressants à Paris avec des évènements animés
