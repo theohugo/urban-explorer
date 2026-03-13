@@ -20,7 +20,7 @@ interface PlacesContextValue {
   loadMorePlaces: () => Promise<void>;
   loadMoreEvents: () => Promise<void>;
   ensurePlacesCount: (minimumCount: number) => Promise<void>;
-  planVisit: (placeId: string, date: string) => Promise<void>;
+  planVisit: (placeId: string, date: string, time?: string) => Promise<void>;
   setProfilePhoto: (uri: string | null) => Promise<void>;
   addMemory: (memory: Memory) => Promise<void>;
   deleteMemory: (id: string) => Promise<void>;
