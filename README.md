@@ -147,30 +147,6 @@ Navigation par onglets avec écrans emboîtés :
 - **LoadingState & ErrorState** : États de chargement et erreur
 - **HeroHeader** : En-tête principal
 
-## 💡 Utilisation
-
-### Découvrir des lieux
-1. Accédez à l'onglet "Decouverte"
-2. Parcourez les évènements
-3. Utilisez la barre de recherche pour filtrer par nom ou adresse
-4. Appuyez sur un évènements pour voir ses détails
-
-### Consulter la carte
-1. Accédez à l'onglet "Carte"
-2. La carte est centrée sur Paris par défaut
-3. Consultez les lieux à proximité
-4. Tapotez les marqueurs pour voir les détails
-
-### Gérer votre profil
-1. Accédez à l'onglet "Mon Profil"
-2. Téléchargez une photo de profil depuis votre appareil ou prenez une photo
-3. Consultez vos visites planifiées
-
-### Consulter les événements
-1. Accédez à l'onglet "Evenements"
-2. Explorez les événements à venir à Paris
-3. Consultez le calendrier pour les dates
-
 ## 🔄 Flux de données
 
 ```
@@ -202,7 +178,7 @@ Le client HTTP utilise des **interceptors pour la gestion des erreurs** :
 - ✅ Erreurs HTTP (4xx, 5xx)
 - ✅ Messages d'erreur formatés en français
 
-## � API Documentation
+## API Documentation
 
 ### Endpoint utilisé
 
@@ -268,7 +244,7 @@ L'API utilise la pagination avec :
 - Pas de calendrier disponible → Fallback gracieux
 - Les erreurs sont loggées en console pour le débogage
 
-## �📝 Notes de développement
+## Notes de développement
 
 - L'application utilise TypeScript pour une meilleure qualité de code
 - Les données sont cachées avec AsyncStorage pour les performances
@@ -279,7 +255,7 @@ L'API utilise la pagination avec :
 
 Ce projet est privé et développé pour IPSSI.
 
-## � Auteurs
+##  Auteurs
 
 Projet développé en équipe par :
 
