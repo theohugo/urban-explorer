@@ -256,47 +256,6 @@ L'API utilise la pagination avec :
 - **Offset** : Récupération progressive des données
 - Support du **infinite scroll** dans l'écran Discovery
 
-## � Intégration Calendrier
-
-### Vue d'ensemble
-
-Urban Explorer intègre automatiquement vos visites planifiées dans le calendrier de votre téléphone. Quand vous réservez une date pour un lieu, un modal s'ouvre pour que vous choisissiez l'heure, puis un événement est créé dans votre calendrier.
-
-### Sélecteur d'heure (TimePickerModal)
-
-Composant personnalisé qui s'affiche en modal bottom-sheet :
-
-```typescript
-// Format d'utilisation
-<TimePickerModal
-  visible={showTimePicker}
-  onConfirm={onTimeConfirm}
-  onCancel={onTimeCancel}
-  initialTime="14:30"
-  minTime="07:00"  // ← Horaires du lieu depuis l'API
-  maxTime="22:00"  // ← Horaires du lieu depuis l'API
-/>
-```
-
-**Fonctionnalités :**
-- Sélection des heures : 0-23h
-- Sélection des minutes : 0, 15, 30, 45 (par pas de 15)
-- **Validation des horaires** : Seulement les horaires valides sont disponibles
-- **Info affichée** : "📅 Horaires du lieu : 07:00 - 22:00"
-- Aperçu en temps réel de l'heure sélectionnée
-- Interface intuitive avec animations
-
-### Service de Calendrier (`calendarService.ts`)
-
-Le service gère l'interaction avec le calendrier de l'appareil :
-
-```typescript
-// Ajouter une visite au calendrier
-await addVisitToCalendar(placeName, placeAddress, dateString);
-
-// Format de date : "2026-03-15" (ISO 8601)
-```
-
 ### Permissions requises
 
 **iOS** (`app.json`) :
