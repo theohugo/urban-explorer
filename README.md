@@ -15,7 +15,7 @@ Une application mobile multiplateforme permettant d'explorer les lieux et évén
 
 ## ✨ Fonctionnalités
 
-- **📍 Découverte de lieux** : Parcourez les lieux intéressants à Paris avec des cartes animées
+- **📍 Découverte de lieux** : Parcourez les lieux intéressants à Paris avec des évènements animés
 - **🔍 Recherche et filtrage** : Trouvez rapidement des lieux par nom ou adresse
 - **🗺️ Carte interactive** : Visualisez les lieux sur une carte géolocalisée de Paris
 - **📅 Calendrier d'événements** : Consultez les événements prévus à Paris
